@@ -3,5 +3,3 @@ site_description: 'Game documentation'
 docs_dir: docs/
 repo_name: 'ChipioIndustries/dueling-cities'
 repo_url: 'https://github.com/ChipioIndustries/dueling-cities'
-theme:
-  name: 'material'
