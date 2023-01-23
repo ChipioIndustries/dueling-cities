@@ -13,6 +13,7 @@
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
 			"$path": "src/shared",
+			"$ignoreUnknownInstances": true,
 			"DevPackages": {
 				"$path": "DevPackages"
 			},
