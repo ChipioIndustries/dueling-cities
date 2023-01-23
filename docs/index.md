@@ -9,7 +9,7 @@ Development Onboarding Checklist:
 1. Join the Guilded server and get access to the Team 3 channel.
 2. From Guilded, join the Trello board through the pinned link.
 3. On Roblox, request to join the [development group](https://www.roblox.com/groups/16833815).
-4. Follow the [development environment setup guide](dev-env).
+5. Follow the [development environment setup guide](dev-env).
 
 ## Project layout
 
