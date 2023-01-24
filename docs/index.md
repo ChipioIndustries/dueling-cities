@@ -10,10 +10,3 @@ Development Onboarding Checklist:
 2. From Guilded, join the Trello board through the pinned link.
 3. On Roblox, request to join the [development group](https://www.roblox.com/groups/16833815).
 5. Follow the [development environment setup guide](dev-env).
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
