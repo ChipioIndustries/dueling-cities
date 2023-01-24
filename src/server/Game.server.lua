@@ -58,7 +58,7 @@ local function convertBuilding(obj: Instance, team: Team)
 end
 
 convert.OnServerEvent:Connect(function(player, start, pos)
-    local gun = player.Character.Gun
+	local gun = player.Character.Gun
 	local handle = gun.Handle
 	local target = 	gun.Target
 
@@ -77,8 +77,8 @@ end)
 
 for _, part in workspace:GetChildren() do
 	if part:IsA("Model") and part:FindFirstChild("OldVersion") then
-        -- Temporary. This should randomize buildings.
-        part:SetAttribute("Stability", 100)
+		-- Temporary. This should randomize buildings.
+		part:SetAttribute("Stability", 100)
 		replaceBuilding(part, part.NewVersion.Value)
 	end
 end
