@@ -1,11 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
-local TweenService = game:GetService("TweenService")
 
-local convert = ReplicatedStorage:WaitForChild("Convert")
+local Convert = ReplicatedStorage.Convert
+local GunScript = require(ReplicatedStorage.Gun)
 
-local info = TweenInfo.new(0.1)
 local rnd = Random.new()
 
 -- Each building should be:
@@ -57,23 +56,38 @@ local function convertBuilding(obj: Instance, team: Team)
 	end
 end
 
-convert.OnServerEvent:Connect(function(player, start, pos)
-	local gun = player.Character.Gun
-	local handle = gun.Handle
-	local target = 	gun.Target
+local function onPlayerAdded(player)
+	local added = nil
+	local removing = nil
+	local gun = nil
 
-	target.Beam.Color = ColorSequence.new(player.Team.TeamColor.Color)
-	target.Beam.Enabled = start
-	target.ParticleEmitter.Enabled = start
-	if start and pos then
-		local result = workspace:Raycast(handle.Position, (pos - handle.Position) * 1.1)	
-		if result then
-			pos = result.Position
-			convertBuilding(result.Instance, player.Team)
-		end
-		TweenService:Create(target, info, {Position = pos}):Play()
+	local function onCharacterAdded(character)
+		local gunModel = character.Gun
+		gun = GunScript.new(gunModel.Handle, gunModel.Target, Convert)
+		gun:connectToServerEvent()
+		gun.onHit.Event:Connect(convertBuilding)
 	end
-end)
+
+	local function onCharacterRemoving()
+		if added then
+			added:Disconnect()
+			added = nil
+		end
+		if removing then
+			removing:Disconnect()
+			removing = nil
+		end
+		if gun then
+			gun:cleanup()
+			gun = nil
+		end
+	end
+
+	player.CharacterAdded:Connect(onCharacterAdded)
+	player.CharacterRemoving:Connect(onCharacterRemoving)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
 
 for _, part in workspace:GetChildren() do
 	if part:IsA("Model") and part:FindFirstChild("OldVersion") then

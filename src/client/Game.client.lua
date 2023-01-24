@@ -6,17 +6,6 @@ local localPlayer = Players.LocalPlayer
 local Convert = ReplicatedStorage:WaitForChild("Convert")
 local GunScript = require(ReplicatedStorage:WaitForChild("Gun"))
 
--- Assumes that the Gun is a model under the starter character
--- The gun model should contain at least:
---   Gun: Model
---     Handle: Part
---       Attachment: Attachment
---       WeldConstraint: WeldConstraint
---     Target: Part
---       Attachment: Attachment
---       Beam: Beam (connected to the two attachments above)
---       ParticleEmitter: ParticleEmitter
-
 local Gun = nil
 
 local function onCharacterAdded(character)
