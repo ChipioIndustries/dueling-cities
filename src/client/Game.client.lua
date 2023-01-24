@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local localPlayer = Players.LocalPlayer
 local Convert = ReplicatedStorage:WaitForChild("Convert")
