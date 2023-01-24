@@ -5,6 +5,9 @@ local TICK_RATE = 0.1
 
 local TWEEN_INFO = TweenInfo.new(TICK_RATE)
 
+local Gun = {}
+Gun.__index = Gun
+
 -- Assumes that the Gun is a model under the starter character
 -- The gun model should contain at least:
 --   Gun: Model
@@ -15,10 +18,6 @@ local TWEEN_INFO = TweenInfo.new(TICK_RATE)
 --       Attachment: Attachment
 --       Beam: Beam (connected to the two attachments above)
 --       ParticleEmitter: ParticleEmitter
-
-local Gun = {}
-Gun.__index = Gun
-
 function Gun.new(handle: Part, target: Part, event: RemoteEvent)
 	local gun = {
 		handle = handle,
