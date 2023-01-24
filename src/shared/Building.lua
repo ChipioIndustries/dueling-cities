@@ -24,11 +24,34 @@ export type VERSION = Building.NEW | Building.OLD
 function Building.new(model: Model)
 	local building = {
 		model = model,
-		stability = 0,
-		motor = Flipper.SingleMotor.new(0),
 	}
 
 	return setmetatable(building, Building)
+end
+
+-- Client functions
+
+function Building:initClient()
+	local motor = Flipper.SingleMotor.new(0)
+
+	local function onStep(value)
+		local field = self.model.Field
+		if value > 0 then
+			field.Color = Teams.NewTeam.TeamColor.Color
+		else
+			field.Color = Teams.OldTeam.TeamColor.Color
+		end
+		field.Transparency = math.max(0, 1 - 0.5 * math.abs(value))
+	end
+
+	local function onAttributeChanged(attr)
+		if attr == "Flux" then
+			motor:setGoal(Flipper.Spring.new(self.model:GetAttribute("Flux"), {frequency = 1/3}))
+		end
+	end
+
+	motor:onStep(onStep)
+	self.model.AttributeChanged:Connect(onAttributeChanged)
 end
 
 -- Server functions
@@ -55,9 +78,9 @@ function Building:_changeVersion(version: VERSION)
 	end
 end
 
-function Building:init()
+function Building:initServer()
 	self:_changeVersion(Building.NEW)
-	self.stability = 100
+	self.model:SetAttribute("Stability", 100)
 end
 
 function Building:onHit(team: Team)
@@ -69,16 +92,29 @@ function Building:onHit(team: Team)
 end
 
 function Building:applyChange(value: number)
-	self.stability += value
-	if self.stability == 0 then
+	local stability = self.model:GetAttribute("Stability")
+	stability = math.clamp(stability + value, -100, 100)
+
+	if stability == 0 then
 		if value < 0 then
-			self.stability = -50
+			stability = -50
+			self.model:SetAttribute("Flux", -10)
 			self:_changeVersion(Building.OLD)
 		else
-			self.stability = 50
+			stability = 50
+			self.model:SetAttribute("Flux", 10)
 			self:_changeVersion(Building.NEW)
 		end
+	else
+		-- If stability and value are the same sign
+		if stability * value > 0 then
+			self.model:SetAttribute("Flux", value * (1 - math.abs(stability) / 100))
+		else
+			self.model:SetAttribute("Flux", value)
+		end
 	end
+
+	self.model:SetAttribute("Stability", stability)
 end
 
 return Building
