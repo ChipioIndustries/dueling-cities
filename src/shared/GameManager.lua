@@ -40,11 +40,31 @@ end
 
 -- Server functions
 
-local function hitBuilding(instance: Instance, team: Team)
+local lastHit = {}
+
+local function setHit(gunHandle, building, team)
+    local lastBuilding = lastHit[gunHandle]
+    if lastBuilding and lastBuilding ~= building then
+        lastBuilding:clearHit()
+    end
+    if building then
+        building:onHit(team)
+    end
+    lastHit[gunHandle] = building
+end
+
+local function hitBuilding(gunHandle: Instance, instance: Instance?, team: Team?)
+    if not instance then
+        setHit(gunHandle, nil, team)
+        return
+    end
+
 	local model = instance:FindFirstAncestorWhichIsA("Model")
-	local building = buildings[model]
+	local building = buildings[model] or buildings[model.Parent]
 	if building then
-		building:onHit(team)
+        setHit(gunHandle, building, team)
+    else
+        setHit(gunHandle, nil, team)
 	end
 end
 
@@ -58,6 +78,7 @@ local function onPlayerAdded(player)
 		gun = GunScript.new(gunModel.Handle, gunModel.Target, Convert)
 		gun:connectToServerEvent()
 		gun.onHit.Event:Connect(hitBuilding)
+        gun.onStop.Event:Connect(hitBuilding)
 	end
 
 	local function onCharacterRemovingServer()

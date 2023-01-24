@@ -31,8 +31,6 @@ end
 
 -- Client functions
 
-local resetSpring = Flipper.Spring.new(0, {frequency = 1/10})
-
 function Building:initClient()
 	local motor = Flipper.SingleMotor.new(0)
 
@@ -49,8 +47,6 @@ function Building:initClient()
 	local function onAttributeChanged(attr)
 		if attr == "Flux" then
 			motor:setGoal(Flipper.Spring.new(self.model:GetAttribute("Flux"), {frequency = 1/3}))
-			task.wait(0.08)
-			motor:setGoal(resetSpring)
 		end
 	end
 
@@ -93,6 +89,10 @@ function Building:onHit(team: Team)
 	else
 		self:applyChange(-1)
 	end
+end
+
+function Building:clearHit()
+	self.model:SetAttribute("Flux", 0)
 end
 
 function Building:applyChange(value: number)
