@@ -26,6 +26,7 @@ function Gun.new(handle: Part, target: Part, event: RemoteEvent)
 		enabled = false,
 		connections = {},
 		onHit = Instance.new("BindableEvent"),
+		onStop = Instance.new("BindableEvent"),
 	}
 
 	return setmetatable(gun, Gun)
@@ -69,13 +70,13 @@ function Gun:connectToUserInput()
 			self:setEnable(true)
 		end
 	end
-	
+
 	local function onInputEnded(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			self:setEnable(false)
 		end
 	end
-	
+
 	self:_connect(UserInputService.InputBegan, onInputBegan)
 	self:_connect(UserInputService.InputEnded, onInputEnded)
 end
@@ -100,9 +101,13 @@ function Gun:connectToServerEvent()
 			if result then
 				pos = result.Position
 
-				self.onHit:Fire(result.Instance, player.Team)
+				self.onHit:Fire(self.handle, result.Instance, player.Team)
+			else
+				self.onStop:Fire(self.handle)
 			end
 			TweenService:Create(self.target, TWEEN_INFO, {Position = pos}):Play()
+		else
+			self.onStop:Fire(self.handle)
 		end
 	end
 
