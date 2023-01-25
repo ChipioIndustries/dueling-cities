@@ -70,13 +70,13 @@ function Gun:connectToUserInput()
 			self:setEnable(true)
 		end
 	end
-	
+
 	local function onInputEnded(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			self:setEnable(false)
 		end
 	end
-	
+
 	self:_connect(UserInputService.InputBegan, onInputBegan)
 	self:_connect(UserInputService.InputEnded, onInputEnded)
 end
