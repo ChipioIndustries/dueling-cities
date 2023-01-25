@@ -4,9 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Convert = ReplicatedStorage:WaitForChild("Convert")
 local GunScript = require(ReplicatedStorage:WaitForChild("Gun"))
 local Building = require(ReplicatedStorage:WaitForChild("Building"))
+local RoundTimer = require(ReplicatedStorage:WaitForChild("RoundTimer"))
 
 local buildings = {}
 local Gun = nil
+local timer = nil
+
+local ROUND_TIME = 20
+local WAIT_TIME = 10
 
 -- Client functions
 
@@ -29,9 +34,13 @@ local function initClient()
     localPlayer.CharacterAdded:Connect(onCharacterAddedClient)
     localPlayer.CharacterRemoving:Connect(onCharacterRemovingClient)
 
+    timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
+    timer:initClient(localPlayer.PlayerGui:WaitForChild("ScreenGui"):WaitForChild("TextLabel"))
+
     for _, part in workspace:GetChildren() do
         if part:IsA("Model") and part:FindFirstChild("OldVersion") then
             -- This assumes that buildings aren't created or destroyed.
+            -- TODO: This is too optimistic about buildings loading in in time
             local building = Building.new(part)
             building:initClient()
         end
@@ -81,6 +90,9 @@ end
 
 local function initServer()
     Players.PlayerAdded:Connect(onPlayerAdded)
+
+    timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
+    timer:initServer()
 
     for _, part in workspace:GetChildren() do
         if part:IsA("Model") and part:FindFirstChild("OldVersion") then
