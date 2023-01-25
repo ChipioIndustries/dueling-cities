@@ -91,6 +91,10 @@ function Building:onHit(team: Team)
 	end
 end
 
+function Building:clearHit()
+	self.model:SetAttribute("Flux", 0)
+end
+
 function Building:applyChange(value: number)
 	local stability = self.model:GetAttribute("Stability")
 	stability = math.clamp(stability + value, -100, 100)

@@ -49,11 +49,31 @@ end
 
 -- Server functions
 
-local function hitBuilding(instance: Instance, team: Team)
-	local model = instance:FindFirstAncestorWhichIsA("Model")
-	local building = buildings[model]
+local lastHit = {}
+
+local function setHit(gunHandle, building, team)
+	local lastBuilding = lastHit[gunHandle]
+	if lastBuilding and lastBuilding ~= building then
+		lastBuilding:clearHit()
+	end
 	if building then
 		building:onHit(team)
+	end
+	lastHit[gunHandle] = building
+end
+
+local function hitBuilding(gunHandle: Instance, instance: Instance?, team: Team?)
+	if not instance then
+		setHit(gunHandle, nil, team)
+		return
+	end
+
+	local model = instance:FindFirstAncestorWhichIsA("Model")
+	local building = buildings[model] or buildings[model.Parent]
+	if building then
+		setHit(gunHandle, building, team)
+	else
+		setHit(gunHandle, nil, team)
 	end
 end
 
@@ -67,6 +87,7 @@ local function onPlayerAdded(player)
 		gun = GunScript.new(gunModel.Handle, gunModel.Target, Convert)
 		gun:connectToServerEvent()
 		gun.onHit.Event:Connect(hitBuilding)
+		gun.onStop.Event:Connect(hitBuilding)
 	end
 
 	local function onCharacterRemovingServer()
@@ -94,17 +115,17 @@ local function initServer()
     timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
     timer:initServer()
 
-    for _, part in workspace:GetChildren() do
-        if part:IsA("Model") and part:FindFirstChild("OldVersion") then
-            -- This assumes that buildings aren't created or destroyed.
-            local building = Building.new(part)
-            buildings[part] = building
-            building:initServer()
-        end
-    end
+	for _, part in workspace:GetChildren() do
+		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
+			-- This assumes that buildings aren't created or destroyed.
+			local building = Building.new(part)
+			buildings[part] = building
+			building:initServer()
+		end
+	end
 end
 
 return  {
-    initClient = initClient,
-    initServer = initServer,
+	initClient = initClient,
+	initServer = initServer,
 }
