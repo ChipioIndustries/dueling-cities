@@ -30,21 +30,21 @@ local function onCharacterRemovingClient()
 end
 
 local function initClient()
-    local localPlayer = Players.LocalPlayer
-    localPlayer.CharacterAdded:Connect(onCharacterAddedClient)
-    localPlayer.CharacterRemoving:Connect(onCharacterRemovingClient)
+	local localPlayer = Players.LocalPlayer
+	localPlayer.CharacterAdded:Connect(onCharacterAddedClient)
+	localPlayer.CharacterRemoving:Connect(onCharacterRemovingClient)
 
-    timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
-    timer:initClient(localPlayer.PlayerGui:WaitForChild("ScreenGui"):WaitForChild("TextLabel"))
+	timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
+	timer:initClient(localPlayer.PlayerGui:WaitForChild("ScreenGui"):WaitForChild("TextLabel"))
 
-    for _, part in workspace:GetChildren() do
-        if part:IsA("Model") and part:FindFirstChild("OldVersion") then
-            -- This assumes that buildings aren't created or destroyed.
-            -- TODO: This is too optimistic about buildings loading in in time
-            local building = Building.new(part)
-            building:initClient()
-        end
-    end
+	for _, part in workspace:GetChildren() do
+		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
+			-- This assumes that buildings aren't created or destroyed.
+			-- TODO: This is too optimistic about buildings loading in in time
+			local building = Building.new(part)
+			building:initClient()
+		end
+	end
 end
 
 -- Server functions
@@ -110,10 +110,10 @@ local function onPlayerAdded(player)
 end
 
 local function initServer()
-    Players.PlayerAdded:Connect(onPlayerAdded)
+	Players.PlayerAdded:Connect(onPlayerAdded)
 
-    timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
-    timer:initServer()
+	timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
+	timer:initServer()
 
 	for _, part in workspace:GetChildren() do
 		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
