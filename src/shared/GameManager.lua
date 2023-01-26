@@ -109,11 +109,28 @@ local function onPlayerAdded(player)
 	player.CharacterRemoving:Connect(onCharacterRemovingServer)
 end
 
+local function startRound()
+    for _, building in buildings do
+        building:changeVersion(Building.NEW)
+    end
+
+    for _, player in Players:GetPlayers() do
+        player:LoadCharacter()
+    end
+end
+
+local function endRound()
+    -- Nothing at the moment
+end
+
 local function initServer()
 	Players.PlayerAdded:Connect(onPlayerAdded)
 
 	timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
 	timer:initServer()
+
+    timer.onStart.Event:Connect(startRound)
+    timer.onStop.Event:Connect(endRound)
 
 	for _, part in workspace:GetChildren() do
 		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
