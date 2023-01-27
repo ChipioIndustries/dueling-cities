@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 
+local rng = Random.new()
+
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local Building = {}
@@ -67,6 +69,13 @@ function Building:_replace(with)
 	clone:SetPrimaryPartCFrame(self.model.PrimaryPart.CFrame)
 	clone.PrimaryPart:Destroy()
 	clone.Name = "Building"
+
+	-- Assumes at most one spawn per building
+	local spawn = clone:FindFirstChildWhichIsA("SpawnLocation", true)
+	if spawn then
+		spawn.Enabled = true
+	end
+
 	clone.Parent = self.model
 end
 
@@ -79,8 +88,13 @@ function Building:changeVersion(version: VERSION)
 end
 
 function Building:initServer()
-	self:changeVersion(Building.NEW)
-	self.model:SetAttribute("Stability", 100)
+	if rng:NextNumber() < 0.5 then
+		self:changeVersion(Building.NEW)
+		self.model:SetAttribute("Stability", 100)
+	else
+		self:changeVersion(Building.OLD)
+		self.model:SetAttribute("Stability", -100)
+	end
 end
 
 function Building:onHit(team: Team)
