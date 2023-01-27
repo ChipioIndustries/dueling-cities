@@ -6,12 +6,25 @@ local GunScript = require(ReplicatedStorage:WaitForChild("Gun"))
 local Building = require(ReplicatedStorage:WaitForChild("Building"))
 local RoundTimer = require(ReplicatedStorage:WaitForChild("RoundTimer"))
 
+local RoundLength: IntValue = ReplicatedStorage:WaitForChild("RoundLength")
+local WaitLength: IntValue = ReplicatedStorage:WaitForChild("WaitLength")
+
 local buildings = {}
 local Gun = nil
 local timer = nil
 
-local ROUND_TIME = 20
-local WAIT_TIME = 10
+local ROUND_TIME
+local WAIT_TIME
+
+if not RoundLength.Value then
+	RoundLength.Changed:Wait()
+end
+ROUND_TIME = RoundLength.Value
+
+if not WaitLength.Value then
+	WaitLength.Changed:Wait()
+end
+WAIT_TIME = WaitLength.Value
 
 -- Client functions
 
