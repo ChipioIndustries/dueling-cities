@@ -58,9 +58,12 @@ end
 function Gun:setEnable(enabled: boolean)
 	self.enabled = enabled
 	self.event:FireServer(enabled)
-	while self.enabled and workspace:GetAttribute("Running") do
-		self:_tick()
-		task.wait(TICK_RATE)
+	if enabled then
+		while self.enabled and workspace:GetAttribute("Running") do
+			self:_tick()
+			task.wait(TICK_RATE)
+		end
+		self.event:FireServer(false)
 	end
 end
 
