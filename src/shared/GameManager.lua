@@ -84,6 +84,14 @@ local function onPlayerAdded(player)
 
 	local function onCharacterAddedServer(character)
 		local gunModel = character.Gun
+		gunModel.AncestryChanged:Connect(function(child, parent)
+			if parent == workspace then
+				gunModel.Handle.WeldConstraint.Part1 = character.RightHand
+				gunModel.Handle.Position = character.RightHand.Position
+				gunModel.Handle:SetNetworkOwner(player)
+			end
+		end)
+
 		gun = GunScript.new(gunModel.Handle, gunModel.Target, Convert)
 		gun:connectToServerEvent()
 		gun.onHit.Event:Connect(hitBuilding)
