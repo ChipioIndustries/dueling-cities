@@ -84,6 +84,14 @@ local function onPlayerAdded(player)
 
 	local function onCharacterAddedServer(character)
 		local gunModel = character.Gun
+		gunModel.AncestryChanged:Connect(function(child, parent)
+			if parent == workspace then
+				gunModel.Handle.WeldConstraint.Part1 = character.RightHand
+				gunModel.Handle.Position = character.RightHand.Position
+				gunModel.Handle:SetNetworkOwner(player)
+			end
+		end)
+
 		gun = GunScript.new(gunModel.Handle, gunModel.Target, Convert)
 		gun:connectToServerEvent()
 		gun.onHit.Event:Connect(hitBuilding)
@@ -109,11 +117,28 @@ local function onPlayerAdded(player)
 	player.CharacterRemoving:Connect(onCharacterRemovingServer)
 end
 
+local function startRound()
+    for _, building in buildings do
+        building:initServer()
+    end
+
+    for _, player in Players:GetPlayers() do
+        player:LoadCharacter()
+    end
+end
+
+local function endRound()
+    -- Nothing at the moment
+end
+
 local function initServer()
 	Players.PlayerAdded:Connect(onPlayerAdded)
 
 	timer = RoundTimer.new(ROUND_TIME, WAIT_TIME)
 	timer:initServer()
+
+    timer.onStart.Event:Connect(startRound)
+    timer.onStop.Event:Connect(endRound)
 
 	for _, part in workspace:GetChildren() do
 		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
