@@ -105,7 +105,11 @@ function Gun:connectToServerEvent()
 		self.enabled = enabled
 		self:setBeamEnabled(enabled)
 		if enabled and pos then
-			local result = workspace:Raycast(self.handle.Position, (pos - self.handle.Position) * 1.1)
+			local params = RaycastParams.new()
+			params.FilterDescendantsInstances = {player.Character}
+			params.FilterType = Enum.RaycastFilterType.Blacklist
+
+			local result = workspace:Raycast(self.handle.Position, (pos - self.handle.Position) * 1.1, params)
 			if result then
 				pos = result.Position
 
