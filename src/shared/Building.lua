@@ -67,6 +67,13 @@ function Building:_replace(with)
 	clone:SetPrimaryPartCFrame(self.model.PrimaryPart.CFrame)
 	clone.PrimaryPart:Destroy()
 	clone.Name = "Building"
+
+	-- Assumes at most one spawn per building
+	local spawn = clone:FindFirstChildWhichIsA("SpawnLocation", true)
+	if spawn then
+		spawn.Enabled = true
+	end
+
 	clone.Parent = self.model
 end
 
