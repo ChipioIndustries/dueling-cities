@@ -4,6 +4,7 @@ local Teams = game:GetService("Teams")
 local rng = Random.new()
 
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local ChangeRate: NumberValue = ReplicatedStorage:WaitForChild("ChangeRate")
 
 local Building = {}
 Building.__index = Building
@@ -11,6 +12,13 @@ Building.__index = Building
 Building.NEW = 1
 Building.OLD = -1
 export type VERSION = Building.NEW | Building.OLD
+
+local CHANGE_RATE
+
+if not ChangeRate.Value then
+	ChangeRate.Changed:Wait()
+end
+CHANGE_RATE = ChangeRate.Value
 
 -- Each building should be:
 -- (name): Model
@@ -99,9 +107,9 @@ end
 
 function Building:onHit(team: Team)
 	if team == Teams.NewTeam then
-		self:applyChange(1)
+		self:applyChange(CHANGE_RATE)
 	else
-		self:applyChange(-1)
+		self:applyChange(-CHANGE_RATE)
 	end
 end
 
@@ -110,10 +118,10 @@ function Building:clearHit()
 end
 
 function Building:applyChange(value: number)
-	local stability = self.model:GetAttribute("Stability")
-	stability = math.clamp(stability + value, -100, 100)
+	local oldStability = self.model:GetAttribute("Stability")
+	local stability = math.clamp(oldStability + value, -100, 100)
 
-	if stability == 0 then
+	if math.sign(oldStability) ~= math.sign(stability) then
 		if value < 0 then
 			stability = -50
 			self.model:SetAttribute("Flux", -10)
@@ -124,11 +132,10 @@ function Building:applyChange(value: number)
 			self:changeVersion(Building.NEW)
 		end
 	else
-		-- If stability and value are the same sign
-		if stability * value > 0 then
-			self.model:SetAttribute("Flux", value * (1 - math.abs(stability) / 100))
+		if math.sign(stability) == math.sign(value) then
+			self.model:SetAttribute("Flux", value * (1 - math.abs(stability) / CHANGE_RATE / 100))
 		else
-			self.model:SetAttribute("Flux", value)
+			self.model:SetAttribute("Flux", value / CHANGE_RATE)
 		end
 	end
 
