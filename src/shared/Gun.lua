@@ -58,9 +58,12 @@ end
 function Gun:setEnable(enabled: boolean)
 	self.enabled = enabled
 	self.event:FireServer(enabled)
-	while self.enabled do
-		self:_tick()
-		task.wait(TICK_RATE)
+	if enabled then
+		while self.enabled and workspace:GetAttribute("Running") do
+			self:_tick()
+			task.wait(TICK_RATE)
+		end
+		self.event:FireServer(false)
 	end
 end
 
@@ -94,7 +97,12 @@ end
 
 function Gun:connectToServerEvent()
 	local function onServerEvent(player, enabled, pos)
+		if enabled and not workspace:GetAttribute("Running") then
+			return
+		end
+
 		self:setColor(player.Team.TeamColor.Color)
+		self.enabled = enabled
 		self:setBeamEnabled(enabled)
 		if enabled and pos then
 			local result = workspace:Raycast(self.handle.Position, (pos - self.handle.Position) * 1.1)
@@ -110,8 +118,22 @@ function Gun:connectToServerEvent()
 			self.onStop:Fire(self.handle)
 		end
 	end
-
+	
+	local function onRunningChanged(attr)
+		if attr ~= "Running" then
+			return
+		end
+		if not workspace:GetAttribute("Running") then
+			if self.enabled then
+				self.onStop:Fire(self.handle)
+			end
+			self.enabled = false
+			self:setBeamEnabled(false)
+		end
+	end
+	
 	self:_connect(self.event.OnServerEvent, onServerEvent)
+	workspace.AttributeChanged:Connect(onRunningChanged)
 end
 
 return Gun
