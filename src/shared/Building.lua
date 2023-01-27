@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 
+local rng = Random.new()
+
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local Building = {}
@@ -86,8 +88,13 @@ function Building:changeVersion(version: VERSION)
 end
 
 function Building:initServer()
-	self:changeVersion(Building.NEW)
-	self.model:SetAttribute("Stability", 100)
+	if rng:NextNumber() < 0.5 then
+		self:changeVersion(Building.NEW)
+		self.model:SetAttribute("Stability", 100)
+	else
+		self:changeVersion(Building.OLD)
+		self.model:SetAttribute("Stability", -100)
+	end
 end
 
 function Building:onHit(team: Team)
