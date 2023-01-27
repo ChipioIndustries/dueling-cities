@@ -97,7 +97,7 @@ end
 
 function Gun:connectToServerEvent()
 	local function onServerEvent(player, enabled, pos)
-		if not workspace:GetAttribute("Running") then
+		if enabled and not workspace:GetAttribute("Running") then
 			return
 		end
 
