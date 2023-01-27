@@ -70,7 +70,7 @@ function Building:_replace(with)
 	clone.Parent = self.model
 end
 
-function Building:_changeVersion(version: VERSION)
+function Building:changeVersion(version: VERSION)
 	if version == Building.NEW then
 		self:_replace(self.model.NewVersion.Value)
 	else
@@ -79,7 +79,7 @@ function Building:_changeVersion(version: VERSION)
 end
 
 function Building:initServer()
-	self:_changeVersion(Building.NEW)
+	self:changeVersion(Building.NEW)
 	self.model:SetAttribute("Stability", 100)
 end
 
@@ -103,11 +103,11 @@ function Building:applyChange(value: number)
 		if value < 0 then
 			stability = -50
 			self.model:SetAttribute("Flux", -10)
-			self:_changeVersion(Building.OLD)
+			self:changeVersion(Building.OLD)
 		else
 			stability = 50
 			self.model:SetAttribute("Flux", 10)
-			self:_changeVersion(Building.NEW)
+			self:changeVersion(Building.NEW)
 		end
 	else
 		-- If stability and value are the same sign
