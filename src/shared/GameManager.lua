@@ -111,7 +111,7 @@ end
 
 local function startRound()
     for _, building in buildings do
-        building:changeVersion(Building.NEW)
+        building:initServer()
     end
 
     for _, player in Players:GetPlayers() do
