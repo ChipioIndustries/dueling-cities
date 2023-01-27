@@ -97,6 +97,10 @@ end
 
 function Gun:connectToServerEvent()
 	local function onServerEvent(player, enabled, pos)
+		if not self.handle:IsDescendantOf(player.Character) then
+			return
+		end
+
 		if enabled and not workspace:GetAttribute("Running") then
 			return
 		end
