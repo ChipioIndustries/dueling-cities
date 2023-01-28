@@ -26,6 +26,20 @@ if not WaitLength.Value then
 end
 WAIT_TIME = WaitLength.Value
 
+local function isBuildingRoot(part: Instance): boolean
+	return part:IsA("Model") and part:FindFirstChild("OldVersion")
+end
+
+local function getBuildingRoot(part: Instance): Model?
+	while not isBuildingRoot(part) do
+		part = part:FindFirstAncestorWhichIsA("Model")
+		if not part then
+			return nil
+		end	
+	end
+	return part
+end
+
 -- Client functions
 
 local function onCharacterAddedClient(character)
@@ -51,7 +65,7 @@ local function initClient()
 	timer:initClient(localPlayer.PlayerGui:WaitForChild("ScreenGui"):WaitForChild("TextLabel"))
 
 	for _, part in workspace:GetChildren() do
-		if part:IsA("Model") and part:FindFirstChild("OldVersion") then
+		if isBuildingRoot(part) then
 			-- This assumes that buildings aren't created or destroyed.
 			-- TODO: This is too optimistic about buildings loading in in time
 			local building = Building.new(part)
@@ -80,9 +94,16 @@ local function hitBuilding(gunHandle: Instance, instance: Instance?, team: Team?
 		setHit(gunHandle, nil, team)
 		return
 	end
-
+	
 	local model = instance:FindFirstAncestorWhichIsA("Model")
-	local building = buildings[model] or buildings[model.Parent]
+	local playerHit = Players:GetPlayerFromCharacter(model)
+	if playerHit then
+		model.Humanoid.Health -= 2
+		return
+	end
+	
+	model = getBuildingRoot(model)
+	local building = model and buildings[model]
 	if building then
 		setHit(gunHandle, building, team)
 	else
